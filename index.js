@@ -1,6 +1,6 @@
-var getActualStep = require('./getActualStep.js')
-var StepDelay = require('./stepDelay.js')
-var xtend = = require('util')._extend
+var getActualStep = require('./getActualStep.js'),
+	StepDelay = require('./stepDelay.js'),
+	xtend = require('util')._extend;
 
 module.exports = function Debouncer(redis, prefix, constructorOptions) {
 	var lock = require('redis-lock')(redis),
