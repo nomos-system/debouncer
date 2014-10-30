@@ -1,11 +1,12 @@
 {
   "name": "debouncer",
-  "version": "1.1.1",
+  "version": "1.1.5",
   "main": "./index.js",
   "author": {
     "name": "ArtskydJ",
     "email": "josephdykstra@gmail.com"
   },
+  "contributors": ["Richard Sulzenbacher <rsulzenbacher@nomos-system.com> (http://nomos-system.com)"],
   "description": "Checks if it was called too recently. Useful for not allowing the same action in too close succession. The time delay can be lengthened on each successful call.",
   "keywords": [
     "debounce",
@@ -17,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ArtskydJ/debouncer"
+    "url": "https://github.com/nomos-system/debouncer"
   },
   "devDependencies": {
     "tap": "~0.4.8",
@@ -30,7 +31,6 @@
     "test": "tap test/*.js"
   },
   "dependencies": {
-    "level-lock": "^1.0.1",
-    "xtend": "^4.0.0"
+	  "redis-lock": "~0.0.8",
   }
 }

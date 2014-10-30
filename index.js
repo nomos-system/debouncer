@@ -1,28 +1,16 @@
-var lock = require('level-lock')
 var getActualStep = require('./getActualStep.js')
 var StepDelay = require('./stepDelay.js')
-var xtend = require('xtend')
+var xtend = = require('util')._extend
 
-//keys are sessionid's, properties: lastStepTime, step
-
-module.exports = function Debouncer(db, constructorOptions) {
-	var debouncerDatabase = db
+module.exports = function Debouncer(redis, prefix, constructorOptions) {
+	var lock = require('redis-lock')(redis);
+	var debouncerDatabase = redis
 	var stepDelay = StepDelay(constructorOptions.delayTimeMs)
 
-	return function debouncer(key, callback, retriedNumber) { //people should only pass in key and callback
-		retriedNumber = retriedNumber || 0
-		var unlock = lock(debouncerDatabase, key, 'rw')
-		if (!unlock) {
-			if (retriedNumber >= 3) {
-				//Uses process.nexttick in case someone passes 'retriedNumber' a number that is >= 3 when the key is locked.
-				//This way their callback always executes in a different stack
-				process.nextTick(callback.bind(null, new Error('could not establish lock on '+key), false))
-			} else {
-				setTimeout(debouncer.bind(null, key, callback, retriedNumber+1), 50)
-			}
-		} else {
+	return function debouncer(key, callback) {
+		key = prefix+key;
+		lock(key+'Lock', function(done) {
 			var cb = function () {
-				unlock()
 				callback.apply(null, arguments)
 			}
 			debouncerDatabase.get(key, function (err, stepInfo) {
@@ -42,7 +30,7 @@ module.exports = function Debouncer(db, constructorOptions) {
 					if (currentTime >= stepInfo.lastStepTime + waitMs) {
 						stepInfo.lastStepTime = currentTime
 						stepInfo.step++
-						debouncerDatabase.put(key, JSON.stringify(stepInfo), function (err) {
+						debouncerDatabase.set(key, JSON.stringify(stepInfo), function (err) {
 							err? cb(err) : cb(null, true)
 						})
 					} else {
@@ -50,6 +38,9 @@ module.exports = function Debouncer(db, constructorOptions) {
 					}
 				}
 			})
-		}
+			
+			// done, release lock
+			done();
+		});
 	}
 }
