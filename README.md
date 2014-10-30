@@ -8,6 +8,7 @@ debouncer
 - [debounce(key, cb)](#debouncekey-cb)
 - [Instantiation Examples](#instantiation-examples)
 - [Full Examples](#full-examples)
+- [TODOs](#todos)
 - [License](#license)
 
 ##Install
@@ -189,6 +190,10 @@ setTimeout(function () {
 	debounce('foo', callback) //true (will be false until 5 sec after this)
 }, 10400)
 ```
+
+#TODOs
+
+- Test's need update
 
 #License
 
