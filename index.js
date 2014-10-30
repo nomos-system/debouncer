@@ -17,10 +17,11 @@ module.exports = function Debouncer(redis, prefix, constructorOptions) {
 				if (err) { //error 
 					cb(err)
 				} else {
-					try { stepInfo = JSON.parse(stepInfo) } catch (e) {
-						stepInfo = {	// init on first usage
-								lastStepTime: 0,
-								step: 0
+					try { stepInfo = JSON.parse(stepInfo) } catch (e) {}
+					if(stepInfo === null) { // init on first usage
+						stepInfo = {	
+							lastStepTime: 0,
+							step: 0
 						};
 					}
 					stepInfo = xtend({
