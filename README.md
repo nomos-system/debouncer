@@ -28,11 +28,12 @@ Each time the action is allowed, the internal step number goes up. The step numb
 
 If `delayTimeMs` is set as a function, it will be passed the step number as it's only argument. It is the function that turns the step number into the disallowed length of time.
 
-#Debouncer(db, opts)
+#Debouncer(db, prefix, opts)
 
 Returns a [`debounce()`](#debouncekey-cb) function.
 
-- `db` takes a level db object.
+- `db` takes a Redis object.
+- `prefix` Redis key prefix
 - `opts` takes an object with the following properties:
 	- `delayTimeMs` can be a function, a number, or an array.
 		- If it is a function, the step is passed as it's first parameter, and the return value is the delay time. `return func(step)`
@@ -54,7 +55,7 @@ Returns a [`debounce()`](#debouncekey-cb) function.
 Always allow after 5 seconds since last allowance:
 
 ```js
-var debounce = Debouncer(database, {
+var debounce = Debouncer(redis, prefix, {
 	delayTimeMs: function (step) { //ignores `step`
 		return 5000
 	}
@@ -64,7 +65,7 @@ var debounce = Debouncer(database, {
 Allow after a random number of seconds between 0 and step: (I am pretty sure that this is not useful in any way.)
 
 ```js
-var debounce = Debouncer(database, {
+var debounce = Debouncer(redis, prefix, {
 	delayTimeMs: function (step) {
 		return Math.floor(Math.random() * step) * 1000
 	}
@@ -77,7 +78,7 @@ var debounce = Debouncer(database, {
 Add 2 seconds after each allowance:
 
 ```js
-var debounce = Debouncer(database, {
+var debounce = Debouncer(redis, prefix, {
 	delayTimeMs: 2000
 })
 ```
@@ -93,7 +94,7 @@ var debounce = Debouncer(database, {
 7. You get it...
 
 ```js
-var debounce = Debouncer(database, {
+var debounce = Debouncer(redis, prefix, {
 	delayTimeMs: [0, 1000, 5000, 20000]
 })
 ```
@@ -101,7 +102,7 @@ var debounce = Debouncer(database, {
 This will act like the one above. Element 0 is set to 0, but the original object is not modified.
 
 ```js
-var debounce = Debouncer(database, {
+var debounce = Debouncer(redis, prefix, {
 	delayTimeMs: [1000, 5000, 20000]
 })
 ```
@@ -111,7 +112,7 @@ var debounce = Debouncer(database, {
 Use `debounce()` with different keys:
 
 ```js
-var debounce = Debouncer(database, {
+var debounce = Debouncer(redis, prefix, {
 	delayTimeMs: function (step) { //ignores step
 		return 5000 //always allow after 5 seconds
 	}
@@ -145,7 +146,7 @@ setTimeout(function () {
 Scaling delay:
 
 ```js
-var debounce = Debouncer(database, {
+var debounce = Debouncer(redis, prefix, {
 	delayTimeMs: function (step) {
 		return step*1000 //allow after `step` seconds (`step` is the number of successes)
 	}
