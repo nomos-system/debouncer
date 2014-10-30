@@ -2,3 +2,6 @@
 ## Custom
 #############
 node_modules/*
+/.buildpath
+/.project
+/.settings
