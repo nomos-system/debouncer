@@ -1,6 +1,6 @@
 var getActualStep = require('./getActualStep.js'),
 	StepDelay = require('./stepDelay.js'),
-	xtend = require('xtend');
+	xtend = require('util')._extend;
 
 module.exports = function Debouncer(redis, prefix, constructorOptions) {
 	var lock = require('redis-lock')(redis),
@@ -17,7 +17,12 @@ module.exports = function Debouncer(redis, prefix, constructorOptions) {
 				if (err) { //error 
 					cb(err)
 				} else {
-					try { stepInfo = JSON.parse(stepInfo) } catch (e) {}
+					try { stepInfo = JSON.parse(stepInfo) } catch (e) {
+						stepInfo = {	// init on first usage
+								lastStepTime: 0,
+								step: 0
+						};
+					}
 					stepInfo = xtend({
 						lastStepTime: new Date().getTime(),
 						step: 0
@@ -34,7 +39,7 @@ module.exports = function Debouncer(redis, prefix, constructorOptions) {
 							err? cb(err) : cb(null, true)
 						})
 					} else {
-						cb(null, false, stepInfo.lastStepTime + waitMs - currentTime) //Unsuccessful
+						cb(null, false, stepInfo.lastStepTime + waitMs - currentTime) // Unsuccessful
 					}
 				}
 			})
