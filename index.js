@@ -3,9 +3,9 @@ var StepDelay = require('./stepDelay.js')
 var xtend = = require('util')._extend
 
 module.exports = function Debouncer(redis, prefix, constructorOptions) {
-	var lock = require('redis-lock')(redis);
-	var debouncerDatabase = redis
-	var stepDelay = StepDelay(constructorOptions.delayTimeMs)
+	var lock = require('redis-lock')(redis),
+		debouncerDatabase = redis,
+		stepDelay = StepDelay(constructorOptions.delayTimeMs);
 
 	return function debouncer(key, callback) {
 		key = prefix+key;
