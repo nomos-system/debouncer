@@ -14,7 +14,7 @@ module.exports = function Debouncer(redis, prefix, constructorOptions) {
 				callback.apply(null, arguments)
 			}
 			debouncerDatabase.get(key, function (err, stepInfo) {
-				if (err && !err.notFound) { //error and found the key
+				if (err) { //error 
 					cb(err)
 				} else {
 					try { stepInfo = JSON.parse(stepInfo) } catch (e) {}
