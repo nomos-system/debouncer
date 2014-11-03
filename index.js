@@ -2,12 +2,17 @@ var getActualStep = require('./getActualStep.js'),
 	StepDelay = require('./stepDelay.js'),
 	xtend = require('util')._extend;
 
-module.exports = function Debouncer(redis, prefix, constructorOptions) {
+module.exports = function Debouncer(redis, options, constructorOptions) {
+	options = xtend({
+		prefix: '',
+		ttl: 1800
+	}, options)
+
 	var lock = require('redis-lock')(redis),
 		stepDelay = StepDelay(constructorOptions.delayTimeMs);
 
 	return function debouncer(key, callback) {
-		key = prefix+key;
+		key = options.prefix+key;
 		lock(key+'Lock', function(done) {
 			var cb = function () {
 				done(); // done, release lock
@@ -37,7 +42,13 @@ module.exports = function Debouncer(redis, prefix, constructorOptions) {
 						stepInfo.lastStepTime = currentTime
 						stepInfo.step++
 						redis.set(key, JSON.stringify(stepInfo), function (err) {
-							err? cb(err) : cb(null, true)
+							if(!err) {
+								redis.expire(key, options.ttl);
+								cb(null, true);
+							}
+							else {
+								cb(err);
+							}
 						})
 					} else {
 						cb(null, false, stepInfo.lastStepTime + waitMs - currentTime) // Unsuccessful
