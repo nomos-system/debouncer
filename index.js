@@ -1,9 +1,8 @@
 var getActualStep = require('./getActualStep.js'),
-	StepDelay = require('./stepDelay.js'),
-	xtend = require('util')._extend;
+	StepDelay = require('./stepDelay.js');
 
 module.exports = function Debouncer(redis, options, constructorOptions) {
-	options = xtend({
+	options = Object.assign({
 		prefix: '',
 		ttl: 1800
 	}, options)
@@ -29,7 +28,7 @@ module.exports = function Debouncer(redis, options, constructorOptions) {
 							step: 0
 						};
 					}
-					stepInfo = xtend({
+					stepInfo = Object.assign({
 						lastStepTime: new Date().getTime(),
 						step: 0
 					}, stepInfo)
@@ -57,4 +56,5 @@ module.exports = function Debouncer(redis, options, constructorOptions) {
 			})
 		});
 	}
+
 }
